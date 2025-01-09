@@ -1,6 +1,5 @@
 import mpv
 import sys
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
@@ -12,10 +11,13 @@ class Test(QMainWindow):
         self.container.setAttribute(Qt.WA_DontCreateNativeAncestors)
         self.container.setAttribute(Qt.WA_NativeWindow)
         player = mpv.MPV(wid=str(int(self.container.winId())),
-                vo='x11', # You may not need this
-                log_handler=print,
-                loglevel='debug')
-        player.play(input('Enter da URL'))
+                         vo='x11',  # You may not need this
+                         log_handler=print,
+                         loglevel='debug')
+
+        url, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter the video URL:')
+        if ok:
+            player.play(url)
 
 app = QApplication(sys.argv)
 
