@@ -1,29 +1,28 @@
-import cv2
+import mpv
+import sys
 
-# URL of the video
-video_url = 'https://bitview.net/videos/22XAsGKsHZsJ9WL58wHb.mp4'
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
-# Create a VideoCapture object
-cap = cv2.VideoCapture(video_url)
+class Test(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.container = QWidget(self)
+        self.setCentralWidget(self.container)
+        self.container.setAttribute(Qt.WA_DontCreateNativeAncestors)
+        self.container.setAttribute(Qt.WA_NativeWindow)
+        player = mpv.MPV(wid=str(int(self.container.winId())),
+                vo='x11', # You may not need this
+                log_handler=print,
+                loglevel='debug')
+        player.play(input('Enter da URL'))
 
-# Check if the video opened successfully
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    exit()
+app = QApplication(sys.argv)
 
-# Read and display the video frames
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    # Display the frame
-    cv2.imshow('Video', frame)
-
-    # Exit if 'q' is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Release the VideoCapture object and close the display window
-cap.release()
-cv2.destroyAllWindows()
+# This is necessary since PyQT stomps over the locale settings needed by libmpv.
+# This needs to happen after importing PyQT before creating the first mpv.MPV instance.
+import locale
+locale.setlocale(locale.LC_NUMERIC, 'C')
+win = Test()
+win.show()
+sys.exit(app.exec_())
